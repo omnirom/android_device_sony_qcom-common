@@ -14,13 +14,30 @@ LOCAL_SHARED_LIBRARIES := \
     libutils \
     libbinder \
     libcutils \
-    libhardware_legacy
+    libhardware_legacy \
+    librilutils
 
 LOCAL_CFLAGS :=
+ifdef BOARD_USES_QCOM_RIL_RESPONSE_5_ELEMENTS
+LOCAL_CFLAGS += -DRIL_RESPONSE_5_ELEMENTS
+endif
+
+ifeq ($(BOARD_RIL_NO_CELLINFOLIST),true)
+LOCAL_CFLAGS += -DRIL_NO_CELL_INFO_LIST
+endif
 
 LOCAL_MODULE:= libril
 
 LOCAL_LDLIBS += -lpthread
+
+#USE HCRADIO
+ifeq ($(BOARD_USES_HC_RADIO),true)
+LOCAL_CFLAGS += -DHCRADIO
+endif
+
+ifeq ($(BOARD_USES_LEGACY_RIL),true)
+LOCAL_CFLAGS += -DLEGACY_RIL
+endif
 
 include $(BUILD_SHARED_LIBRARY)
 
@@ -35,7 +52,8 @@ LOCAL_SRC_FILES:= \
 
 LOCAL_STATIC_LIBRARIES := \
     libutils_static \
-    libcutils
+    libcutils \
+    librilutils_static
 
 LOCAL_CFLAGS :=
 
