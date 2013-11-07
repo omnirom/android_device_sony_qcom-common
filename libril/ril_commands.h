@@ -35,7 +35,6 @@
     {RIL_REQUEST_LAST_CALL_FAIL_CAUSE, dispatchVoid, responseInts},
     {RIL_REQUEST_SIGNAL_STRENGTH, dispatchVoid, responseRilSignalStrength},
     {RIL_REQUEST_VOICE_REGISTRATION_STATE, dispatchVoid, responseStrings},
-    //{RIL_REQUEST_DATA_REGISTRATION_STATE, dispatchVoid, responseStrings},
     {RIL_REQUEST_DATA_REGISTRATION_STATE, dispatchVoid, responseStringsDataRegistrationState},
     {RIL_REQUEST_OPERATOR, dispatchVoid, responseStrings},
     {RIL_REQUEST_RADIO_POWER, dispatchInts, responseVoid},
@@ -124,3 +123,10 @@
     {RIL_REQUEST_ACKNOWLEDGE_INCOMING_GSM_SMS_WITH_PDU, dispatchStrings, responseVoid},
     {RIL_REQUEST_STK_SEND_ENVELOPE_WITH_STATUS, dispatchString, responseSIM_IO},
     {RIL_REQUEST_VOICE_RADIO_TECH, dispatchVoiceRadioTech, responseInts},
+#ifndef RIL_NO_CELL_INFO_LIST
+    {RIL_REQUEST_GET_CELL_INFO_LIST, dispatchVoid, responseCellInfoList},
+    {RIL_REQUEST_SET_UNSOL_CELL_INFO_LIST_RATE, dispatchInts, responseVoid},
+#endif
+    {RIL_REQUEST_SET_INITIAL_ATTACH_APN, dispatchSetInitialAttachApn, responseVoid},
+    {RIL_REQUEST_IMS_REGISTRATION_STATE, dispatchVoid, responseInts},
+    {RIL_REQUEST_IMS_SEND_SMS, dispatchImsSms, responseSMS},
