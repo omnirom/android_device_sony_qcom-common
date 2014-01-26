@@ -47,6 +47,10 @@ PRODUCT_PACKAGES += \
     libmm-omxcore \
     libstagefrighthw
 
+# Interface command library
+PRODUCT_PACKAGES += \
+    libnetcmdiface
+
 # Power
 PRODUCT_PACKAGES += \
     power.qcom
