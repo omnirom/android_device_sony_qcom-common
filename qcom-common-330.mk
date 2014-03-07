@@ -19,9 +19,5 @@ $(call inherit-product, device/sony/qcom-common/qcom-common.mk)
 PRODUCT_PROPERTY_OVERRIDES += \
     debug.composition.type=c2d
 
-# OpenGL ES 3.0
-PRODUCT_PROPERTY_OVERRIDES += \
-    ro.opengles.version=196608
-
 # Include non-opensource parts
 $(call inherit-product, vendor/sony/qcom-common/qcom-common-vendor-330.mk)
