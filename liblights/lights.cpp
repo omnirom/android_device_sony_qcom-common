@@ -15,7 +15,7 @@
  */
 
 /**
-* @file ligths.cpp
+* @file lights.cpp
 *
 * Handle backlight in AOSP style and forward led notification
 * to the Sony light HAL.
@@ -36,6 +36,22 @@
 #include <cutils/properties.h>
 
 #include "sony_lights.h"
+
+#ifndef PWR_RED_USE_PATTERN_FILE
+#define PWR_RED_USE_PATTERN_FILE "/sys/class/leds/pwr-red/use_pattern"
+#endif
+
+#ifndef PWR_GREEN_USE_PATTERN_FILE
+#define PWR_GREEN_USE_PATTERN_FILE "/sys/class/leds/pwr-green/use_pattern"
+#endif
+
+#ifndef PWR_BLUE_USE_PATTERN_FILE
+#define PWR_BLUE_USE_PATTERN_FILE "/sys/class/leds/pwr-blue/use_pattern"
+#endif
+
+#ifndef PATTERN_DATA_FILE
+#define PATTERN_DATA_FILE "/sys/bus/i2c/devices/10-0040/pattern_data"
+#endif
 
 static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 
@@ -210,6 +226,35 @@ static int get_max_brightness() {
     return (unsigned int) max_brightness;
 }
 
+static int lights_set_light_notifications(struct light_device_t* dev,
+                     struct light_state_t const* state)
+{
+	int rv = 0;
+
+    ALOGV("%s->%08X->%08X", __FUNCTION__, (uintptr_t)dev, (uintptr_t)(((wrapper_light_device_t*)dev)->vendor));
+
+    if(!dev)
+        return -EINVAL;
+
+    rv = VENDOR_CALL(dev, set_light, state);
+
+	/* If notification led needs to be turned off, we reset use_pattern and pattern_data
+	 * to avoid conflict between the previous pattern data and battery led.
+     * And we don't need to check the return value here, since the path may differ among devices.
+     * Even if the paths are not set correctly and these commands fail,
+     * user experience won't be affected too much. Throwing an error here will be disturbing.
+     * When a new notif arrives, HAL will set these files to 1 automatically.
+     * But HAL seems to forget setting them to 0 when notif is cleared. */
+	if (0 == state->color & 0x00ffffff) {
+		write_int(PWR_RED_USE_PATTERN_FILE, 0);
+		write_int(PWR_GREEN_USE_PATTERN_FILE, 0);
+		write_int(PWR_BLUE_USE_PATTERN_FILE, 0);
+		write_int(PATTERN_DATA_FILE, 0);
+	}
+
+	return rv;
+}
+
 static int lights_set_light_backlight (struct light_device_t *dev, struct light_state_t const *state) {
     int err = 0;
     int brightness = rgb_to_brightness(state);
@@ -229,6 +274,10 @@ static int lights_set_light_backlight (struct light_device_t *dev, struct light_
     pthread_mutex_lock(&g_lock);
     err |= write_int (LCD_BACKLIGHT_FILE, brightness);
     err |= write_int (LCD_BACKLIGHT2_FILE, brightness);
+#ifdef DEVICE_HAYABUSA
+    err |= write_int (LOGO_BACKLIGHT_FILE, brightness);
+    err |= write_int (LOGO_BACKLIGHT2_FILE, brightness);
+#endif
     pthread_mutex_unlock(&g_lock);
 
     return err;
@@ -272,7 +321,7 @@ static int open_lights(const hw_module_t* module, const char* name,
         else if (0 == strcmp(LIGHT_ID_BATTERY, name))
             set_light = lights_set_light;
         else if (0 == strcmp(LIGHT_ID_NOTIFICATIONS, name))
-            set_light = lights_set_light;
+            set_light = lights_set_light_notifications;
 /* LIGHT_ID_ATTENTION is not supported by Sony HAL
         else if (0 == strcmp(LIGHT_ID_ATTENTION, name))
             set_light = lights_set_light;
