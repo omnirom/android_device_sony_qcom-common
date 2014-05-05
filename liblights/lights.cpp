@@ -37,6 +37,22 @@
 
 #include "sony_lights.h"
 
+#ifndef PWR_RED_USE_PATTERN_FILE
+#define PWR_RED_USE_PATTERN_FILE "/sys/class/leds/pwr-red/use_pattern"
+#endif
+
+#ifndef PWR_GREEN_USE_PATTERN_FILE
+#define PWR_GREEN_USE_PATTERN_FILE "/sys/class/leds/pwr-green/use_pattern"
+#endif
+
+#ifndef PWR_BLUE_USE_PATTERN_FILE
+#define PWR_BLUE_USE_PATTERN_FILE "/sys/class/leds/pwr-blue/use_pattern"
+#endif
+
+#ifndef PATTERN_DATA_FILE
+#define PATTERN_DATA_FILE "/sys/bus/i2c/devices/10-0040/pattern_data"
+#endif
+
 static pthread_mutex_t g_lock = PTHREAD_MUTEX_INITIALIZER;
 
 static android::Mutex gLightWrapperLock;
@@ -73,6 +89,8 @@ typedef struct wrapper_light_device {
     wrapper_light_device_t *__wrapper_dev = (wrapper_light_device_t*) dev; \
     __wrapper_dev->vendor->func(__wrapper_dev->vendor, ##__VA_ARGS__); \
 })
+
+int is_notif_led_running = 0;
 
 static int check_vendor_module()
 {
@@ -210,6 +228,60 @@ static int get_max_brightness() {
     return (unsigned int) max_brightness;
 }
 
+static int lights_set_light_notifications(struct light_device_t* dev,
+                     struct light_state_t const* state)
+{
+	int rv = 0;
+
+    ALOGV("%s->%08X->%08X", __FUNCTION__, (uintptr_t)dev, (uintptr_t)(((wrapper_light_device_t*)dev)->vendor));
+
+    if(!dev)
+        return -EINVAL;
+
+    rv = VENDOR_CALL(dev, set_light, state);
+
+	/* If notification led needs to be turned off, we reset use_pattern and pattern_data
+	 * to avoid conflict between the previous pattern data and battery led.
+     * When a new notif arrives, HAL will set these files to 1 automatically.
+     * But HAL seems to forget setting them to 0 when notif is cleared. */
+	if (0 == (state->color & 0x00ffffff)) {
+		ALOGV("%s setting use_pattern to 0", __FUNCTION__);
+		write_int(PWR_RED_USE_PATTERN_FILE, 0);
+		write_int(PWR_GREEN_USE_PATTERN_FILE, 0);
+		write_int(PWR_BLUE_USE_PATTERN_FILE, 0);
+		write_int(PATTERN_DATA_FILE, 0);
+		is_notif_led_running = 0;
+	} else {
+		is_notif_led_running = 1;
+	}
+
+	return rv;
+}
+
+static int lights_set_light_battery(struct light_device_t* dev,
+                     struct light_state_t const* state)
+{
+	int rv = 0;
+
+    ALOGV("%s->%08X->%08X", __FUNCTION__, (uintptr_t)dev, (uintptr_t)(((wrapper_light_device_t*)dev)->vendor));
+
+    if(!dev)
+        return -EINVAL;
+
+    rv = VENDOR_CALL(dev, set_light, state);
+
+	/* if battery led is about to light up and no notif is present */
+	if ((0 != (state->color & 0x00ffffff)) && (is_notif_led_running == 0)) {
+		ALOGV("%s setting use_pattern files to 0", __FUNCTION__);
+		write_int(PWR_RED_USE_PATTERN_FILE, 0);
+		write_int(PWR_GREEN_USE_PATTERN_FILE, 0);
+		write_int(PWR_BLUE_USE_PATTERN_FILE, 0);
+		write_int(PATTERN_DATA_FILE, 0);
+	}
+
+	return rv;
+}
+
 static int lights_set_light_backlight (struct light_device_t *dev, struct light_state_t const *state) {
     int err = 0;
     int brightness = rgb_to_brightness(state);
@@ -270,9 +342,9 @@ static int open_lights(const hw_module_t* module, const char* name,
         else if (0 == strcmp(LIGHT_ID_BUTTONS, name))
             set_light = lights_set_light;
         else if (0 == strcmp(LIGHT_ID_BATTERY, name))
-            set_light = lights_set_light;
+            set_light = lights_set_light_battery;
         else if (0 == strcmp(LIGHT_ID_NOTIFICATIONS, name))
-            set_light = lights_set_light;
+            set_light = lights_set_light_notifications;
 /* LIGHT_ID_ATTENTION is not supported by Sony HAL
         else if (0 == strcmp(LIGHT_ID_ATTENTION, name))
             set_light = lights_set_light;
