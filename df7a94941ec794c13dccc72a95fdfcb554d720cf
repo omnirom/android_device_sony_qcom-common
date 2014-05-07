@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "8b77b57d_ba6ca299",
+        "filename": "liblights/lights.cpp",
+        "patchSetId": 3
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1000008
+      },
+      "writtenOn": "2014-05-07T03:37:14Z",
+      "side": 1,
+      "message": "You need to write to both LOGO_BACKLIGHT_FILE and LCD_BACKLIGHT_FILE?  Not one or the other?",
+      "revId": "df7a94941ec794c13dccc72a95fdfcb554d720cf",
+      "serverId": "56841c99-7c94-43d4-bf0b-cb4707e66d55",
+      "unresolved": false
+    }
+  ]
+}
