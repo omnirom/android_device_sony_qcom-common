@@ -49,10 +49,6 @@ BOARD_USES_QCOM_RIL_RESPONSE_5_ELEMENTS := true
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 
-# Webkit
-ENABLE_WEBGL := true
-TARGET_FORCE_CPU_UPLOAD := true
-
 BOARD_SEPOLICY_DIRS += \
     device/sony/qcom-common/sepolicy
 
