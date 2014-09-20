@@ -98,6 +98,20 @@ PRODUCT_PROPERTY_OVERRIDES += \
 PRODUCT_PROPERTY_OVERRIDES += \
     ro.opengles.version=196608
 
+ifeq ($(USE_ADRENO_2XX),true)
+USE_ADRENO_2XX := true
+$(call inherit-product, vendor/sony/qcom-common/qcom-common-2xx-vendor.mk)
+endif
+
+ifeq ($(USE_ADRENO_330),true)
+
+PRODUCT_PROPERTY_OVERRIDES += \
+    debug.composition.type=c2d
+
+USE_ADRENO_330 := true
+$(call inherit-product, vendor/sony/qcom-common/qcom-common-330-vendor.mk)
+endif
+
 ifneq ($(USE_ADRENO_2XX),true)
 ifneq ($(USE_ADRENO_330),true)
 PRODUCT_PROPERTY_OVERRIDES += \
