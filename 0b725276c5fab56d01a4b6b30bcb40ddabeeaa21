@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "cb528df8_d36fa6f6",
+        "filename": "qcom-common.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1000124
+      },
+      "writtenOn": "2014-09-23T23:10:00Z",
+      "side": 1,
+      "message": "if it\u0027s true...",
+      "revId": "0b725276c5fab56d01a4b6b30bcb40ddabeeaa21",
+      "serverId": "56841c99-7c94-43d4-bf0b-cb4707e66d55",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb528df8_f374aacf",
+        "filename": "qcom-common.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1000124
+      },
+      "writtenOn": "2014-09-23T23:10:00Z",
+      "side": 1,
+      "message": "make it true?",
+      "revId": "0b725276c5fab56d01a4b6b30bcb40ddabeeaa21",
+      "serverId": "56841c99-7c94-43d4-bf0b-cb4707e66d55",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb528df8_137a0eb9",
+        "filename": "qcom-common.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1000124
+      },
+      "writtenOn": "2014-09-23T23:10:00Z",
+      "side": 1,
+      "message": "if it\u0027s true...",
+      "revId": "0b725276c5fab56d01a4b6b30bcb40ddabeeaa21",
+      "serverId": "56841c99-7c94-43d4-bf0b-cb4707e66d55",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "cb528df8_337712d2",
+        "filename": "qcom-common.mk",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1000124
+      },
+      "writtenOn": "2014-09-23T23:10:00Z",
+      "side": 1,
+      "message": "make it true?",
+      "revId": "0b725276c5fab56d01a4b6b30bcb40ddabeeaa21",
+      "serverId": "56841c99-7c94-43d4-bf0b-cb4707e66d55",
+      "unresolved": false
+    }
+  ]
+}
