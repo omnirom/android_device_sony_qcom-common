@@ -87,6 +87,13 @@ PRODUCT_PACKAGES += \
     libqsap_sdk
 endif
 
+PRODUCT_PACKAGES += \
+    libwpa_client \
+    hostapd \
+    dhcpcd.conf \
+    wpa_supplicant \
+    wpa_supplicant.conf
+
 # QCOM Display
 PRODUCT_PROPERTY_OVERRIDES += \
     debug.sf.hw=1 \
