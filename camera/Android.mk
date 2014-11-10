@@ -1,10 +1,6 @@
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
-ifeq ($(BOARD_CAMERA_HAVE_ISO),true)
-    LOCAL_CFLAGS += -DHAVE_ISO
-endif
-
 LOCAL_SRC_FILES := \
     CameraWrapper.cpp
 
