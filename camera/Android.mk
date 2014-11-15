@@ -1,3 +1,4 @@
+ifneq ($(USE_CAMERA_STUB),true)
 LOCAL_PATH := $(call my-dir)
 include $(CLEAR_VARS)
 
@@ -17,3 +18,4 @@ LOCAL_MODULE := camera.qcom
 LOCAL_MODULE_TAGS := optional
 
 include $(BUILD_SHARED_LIBRARY)
+endif #USE_CAMERA_STUB
