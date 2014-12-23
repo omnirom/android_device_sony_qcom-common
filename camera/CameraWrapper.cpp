@@ -52,6 +52,9 @@ static char VALUE_SONY_ON[] = "on";
 static char VALUE_SONY_OFF[] = "off";
 static char VALUE_SONY_STILL_HDR[] = "on-still-hdr";
 
+static char KEY_SUPPORTED_ISO_MODES[] = "iso-values";
+static char KEY_ISO_MODE[] = "iso";
+
 
 static android::Mutex gCameraWrapperLock;
 static camera_module_t *gVendorModule = 0;
@@ -114,11 +117,11 @@ void camera_fixup_capability(android::CameraParameters *params)
     ALOGV("%s", __FUNCTION__);
 
     if (params->get(KEY_SONY_IMAGE_STABILISER_VALUES)) {
-        const char* supportedIsModes = params->get(KEY_SONY_IMAGE_STABILISER_VALUES);
+        const char *supportedIsModes = params->get(KEY_SONY_IMAGE_STABILISER_VALUES);
 
         if (strstr(supportedIsModes, VALUE_SONY_STILL_HDR) != NULL) {
-            char buffer[255];
-            const char* supportedSceneModes = params->get(android::CameraParameters::KEY_SUPPORTED_SCENE_MODES);
+            char buffer[512];
+            const char *supportedSceneModes = params->get(android::CameraParameters::KEY_SUPPORTED_SCENE_MODES);
             sprintf(buffer, "%s,hdr", supportedSceneModes);
             params->set(android::CameraParameters::KEY_SUPPORTED_SCENE_MODES, buffer);
         }
@@ -146,7 +149,7 @@ static char * camera_fixup_getparams(int id, const char * settings)
             }
         }
         sprintf(buffer, "%s,auto", buffer);
-        params.set(android::CameraParameters::KEY_SUPPORTED_ISO_MODES, buffer);
+        params.set(KEY_SUPPORTED_ISO_MODES, buffer);
     }
 
     if (params.get(KEY_SONY_IMAGE_STABILISER)) {
@@ -166,16 +169,16 @@ static char * camera_fixup_getparams(int id, const char * settings)
         if (params.get(KEY_SONY_AE_MODE_VALUES)) {
             const char* aeMode = params.get(KEY_SONY_AE_MODE);
             if (strcmp(aeMode, "auto") == 0 ) {
-                params.set(android::CameraParameters::KEY_ISO_MODE, "auto");
+                params.set(KEY_ISO_MODE, "auto");
                 params.set("shutter-speed","auto");
             } else if (strcmp(aeMode, "iso-prio") == 0) {
                 char *isoVal = (char*)malloc(sizeof(char)*
                         (3 + strlen(params.get(KEY_SONY_ISO_MODE))));
                 sprintf(isoVal,"ISO%s",params.get(KEY_SONY_ISO_MODE));
-                params.set(android::CameraParameters::KEY_ISO_MODE,isoVal);
+                params.set(KEY_ISO_MODE,isoVal);
                 params.set("shutter-speed","auto");
             } else if (strcmp(aeMode, "shutter-prio") == 0) {
-                params.set(android::CameraParameters::KEY_ISO_MODE, "auto");
+                params.set(KEY_ISO_MODE, "auto");
                 const char* shutterSpeed = params.get("sony-shutter-speed");
                 if (shutterSpeed) {
                     params.set("shutter-speed",shutterSpeed);
@@ -188,9 +191,9 @@ static char * camera_fixup_getparams(int id, const char * settings)
                 char *isoVal = (char*)malloc(sizeof(char)*
                                         (3 + strlen(params.get(KEY_SONY_ISO_MODE))));
                 sprintf(isoVal,"ISO%s",params.get(KEY_SONY_ISO_MODE));
-                params.set(android::CameraParameters::KEY_ISO_MODE,isoVal);
+                params.set(KEY_ISO_MODE,isoVal);
             } else {
-                params.set(android::CameraParameters::KEY_ISO_MODE, "auto");
+                params.set(KEY_ISO_MODE, "auto");
                 params.set("shutter-speed","auto");
             }
         }
@@ -221,8 +224,8 @@ char * camera_fixup_setparams(int id, const char * settings)
         }
     }
 
-    if (params.get(android::CameraParameters::KEY_ISO_MODE)) {
-        const char* isoMode = params.get(android::CameraParameters::KEY_ISO_MODE);
+    if (params.get(KEY_ISO_MODE)) {
+        const char* isoMode = params.get(KEY_ISO_MODE);
         if (strcmp(isoMode, "auto") != 0) {
             params.set(KEY_SONY_ISO_MODE, isoMode + 3);
         }
@@ -246,7 +249,7 @@ char * camera_fixup_setparams(int id, const char * settings)
     }
 
     if (params.get(android::CameraParameters::KEY_SCENE_MODE)) {
-        const char* sceneMode = params.get(android::CameraParameters::KEY_SCENE_MODE);
+        const char *sceneMode = params.get(android::CameraParameters::KEY_SCENE_MODE);
         if (strcmp(sceneMode, "hdr") == 0) {
             params.set(KEY_SONY_IMAGE_STABILISER, VALUE_SONY_STILL_HDR);
             params.set(android::CameraParameters::KEY_SCENE_MODE, android::CameraParameters::SCENE_MODE_AUTO);
