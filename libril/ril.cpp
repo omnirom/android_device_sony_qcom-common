@@ -551,7 +551,9 @@ dispatchString (Parcel& p, RequestInfo *pRI) {
     size_t datalen;
     size_t stringlen;
     char *string8 = NULL;
+    int rqn;
 
+    rqn = pRI->pCI->requestNumber;
     string8 = strdupReadString(p);
 
     startRequest;
@@ -561,6 +563,19 @@ dispatchString (Parcel& p, RequestInfo *pRI) {
 
     CALL_ONREQUEST(pRI->pCI->requestNumber, string8,
                        sizeof(char *), pRI, pRI->socket_id);
+
+    if (rqn == pRI->pCI->requestNumber) {
+        RLOGE("pabx: WARNING: qcomril did NOT handle request %d\n", rqn);
+        switch (rqn) {
+            case RIL_REQUEST_SIM_OPEN_CHANNEL:
+                RLOGE("pabx: sending error for SIM_OPEN_CHANNEL request\n");
+                RIL_onRequestComplete(pRI, RIL_E_GENERIC_FAILURE, NULL, 0); // required to trigger the SIM_READY / LOADED event in UiccCarrierPrivilegeRules.java
+                break;
+            default:
+                RLOGE("pabx: note: this error was not reported to the upper subsystem\n");
+        }
+    }
+
 
 #ifdef MEMSET_FREED
     memsetString(string8);
