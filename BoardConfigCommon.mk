@@ -38,9 +38,6 @@ ifeq ($(BOARD_EGL_CFG),)
 BOARD_EGL_CFG := device/sony/qcom-common/rootdir/system/lib/egl/egl.cfg
 endif
 
-# RIL
-BOARD_RIL_CLASS := ../../../device/sony/qcom-common/ril/
-
 # Bluetooth
 BOARD_HAVE_BLUETOOTH := true
 
